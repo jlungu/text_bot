@@ -1,50 +1,72 @@
 import requests
 import locale
 from datetime import date
+import datetime
 
 ## USED TO TEST TEXTS BEFORE I SEND, TO SAVE TEXTING MONEY.
 
-# Here, we grab a quote from our Stock API. Quotes for ^DJI, ^GSPC, and ^IXIC
-# DOW JONES INDUSTRIAL AVERAGE
-dji = requests.get('https://finnhub.io/api/v1/quote?symbol=^DJI&token=brain17rh5rbgnjpuck0')
-dji_close = dji.json()['c'] # price
-dji_change = dji_close - dji.json()['pc'] # change
-dji_perchange =  (dji_change / dji_close) * 100 # % change
-dji_perchange = '%.2f' % dji_perchange + '%'
-if dji_change > 0:# put + if its a positive number
-    dji_change = '+' + ('%.2f' % dji_change)
-    dji_perchange = "+"+  dji_perchange
-else:
-    dji_change = '%.2f' % dji_change
-dji_close = '$' +  f"{dji_close:,}"
-# S & P 500
-gspc = requests.get('https://finnhub.io/api/v1/quote?symbol=^GSPC&token=brain17rh5rbgnjpuck0')
-gspc_close = gspc.json()['c']
-gspc_change = gspc_close - gspc.json()['pc'] # change
-gspc_perchange =  (gspc_change / gspc_close) * 100 # % change
-gspc_perchange = '%.2f' % gspc_perchange + '%'
-if gspc_change > 0:
-    gspc_change = '+' + ('%.2f' % gspc_change)
-    gspc_perchange = "+"+  gspc_perchange
-else:
-    gspc_change = '%.2f' % gspc_change
-gspc_close = '$' +  f"{gspc_close:,}"
-# NASDAQ
-ixic = requests.get('https://finnhub.io/api/v1/quote?symbol=^IXIC&token=brain17rh5rbgnjpuck0')
-ixic_close = ixic.json()['c']
-ixic_change = ixic_close - ixic.json()['pc'] # change
-ixic_perchange =  (ixic_change / ixic_close) * 100 # % change
-ixic_perchange = '%.2f' % ixic_perchange + '%'
-if ixic_change > 0:
-    ixic_change = '+' + ('%.2f' % ixic_change)
-    ixic_perchange = "+"+  ixic_perchange
-else:
-    ixic_change = '%.2f' % ixic_change
-ixic_close = '$' +  f"{ixic_close:,}"
-
-# Need todays date...
-today = date.today().strftime("%B %d, %Y")
-# Now we create the master string, formatted to send the text!
-text = "Market Update | " + str(today) + "\n" + "- DOW J: " + str(dji_close) + "\n\t" + str(dji_change) + "(" + str(dji_perchange) + ")\n- S&P 500: " + str(gspc_close) + "\n\t" + str(gspc_change) + "(" + str(gspc_perchange) + ")\n- NASDAQ: " + str(ixic_close) + "\n\t" + str(ixic_change) + "(" + str(ixic_perchange) + ")"
-
-print(text)
+# COVID updates
+states = {'alabama': 'AL',
+    'alaska': 'AK',
+    'american samoa': 'AS',
+    'arizona': 'AZ',
+    'arkansas': 'AR',
+    'california': 'CA',
+    'colorado': 'CO',
+    'connecticut': 'CT',
+    'delaware': 'DE',
+    'district of columbia': 'DC',
+    'florida': 'FL',
+    'georgia': 'GA',
+    'guam': 'GU',
+    'hawaii': 'HI',
+    'idaho': 'ID',
+    'illinois': 'IL',
+    'indiana': 'IN',
+    'iowa': 'IA',
+    'kansas': 'KS',
+    'kentucky': 'KY',
+    'louisiana': 'LA',
+    'maine': 'ME',
+    'maryland': 'MD',
+    'massachusetts': 'MA',
+    'michigan': 'MI',
+    'minnesota': 'MN',
+    'mississippi': 'MS',
+    'missouri': 'MO',
+    'montana': 'MT',
+    'nebraska': 'NE',
+    'nevada': 'NV',
+    'new hampshire': 'NH',
+    'new jersey': 'NJ',
+    'new mexico': 'NM',
+    'new york': 'NY',
+    'north carolina': 'NC',
+    'north dakota': 'ND',
+    'northern mariana islands':'MP',
+    'ohio': 'OH',
+    'oklahoma': 'OK',
+    'oregon': 'OR',
+    'pennsylvania': 'PA',
+    'puerto rico': 'PR',
+    'rhode island': 'RI',
+    'south carolina': 'SC',
+    'south dakota': 'SD',
+    'tennessee': 'TN',
+    'texas': 'TX',
+    'utah': 'UT',
+    'vermont': 'VT',
+    'virgin islands': 'VI',
+    'virginia': 'VA',
+    'washington': 'WA',
+    'west virginia': 'WV',
+    'wisconsin': 'WI',
+    'wyoming': 'WY'}
+# Takes state as input, and returns the latest covid numbers for that state.
+state = "New York"
+state = states[state.lower()] # Grabbing the states abbreviation
+cases = requests.get('https://covidtracking.com/api/v1/states/' + state.lower() + '/current.json')
+cases = cases.json()
+updated = datetime.datetime(int(cases['dateModified'][:4]), int(cases['dateModified'][5:7]), int(cases['dateModified'][8:10]), int(cases['dateModified'][11:13]), int(cases['dateModified'][14:16]), int(cases['dateModified'][17:19]), 0)
+update = "COVID-19 Update | NEW YORK - USA\n- New Cases: "+ f"{cases['positiveIncrease']:,}" + "\n- New Deaths: " + f"{cases['deathIncrease']:,}" + "\n- Total Cases: " + f"{cases['positive']:,}" + "\n- Total Deaths: " + f"{cases['death']:,}," + "\nUpdated " + date.strftime(updated, "%B %d, %Y %I:%M%p")
+print(update)
