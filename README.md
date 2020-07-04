@@ -1,6 +1,6 @@
 # A Texting Bot, providing Market Updates and COVID-19 Case Updates.
-## Market Update | COVID Update
-![](images/one.gif)![](images/two.gif)
+## Market Update & COVID Update Demos
+![](images/one1.gif)  ![](images/two2.gif)
 ### How does it work?
 A User simple needs to text 'market update' for a market update, or 'covid [territory]' for a covid update, where 'territory' can be any US state, or just 'USA' for 
 the whole United States.
