@@ -63,10 +63,14 @@ states = {'alabama': 'AL',
     'wisconsin': 'WI',
     'wyoming': 'WY'}
 # Takes state as input, and returns the latest covid numbers for that state.
-state = "New York"
-state = states[state.lower()] # Grabbing the states abbreviation
-cases = requests.get('https://covidtracking.com/api/v1/states/' + state.lower() + '/current.json')
+state = "New Yrk"
+if state.lower() in states:
+    state = states[state.lower()] # Grabbing the states abbreviation
+else:
+    print("poop")
+#state = states[state.lower()] # Grabbing the states abbreviation
+cases = requests.get('https://covidtracking.com/api/v1/us/current.json')
 cases = cases.json()
-updated = datetime.datetime(int(cases['dateModified'][:4]), int(cases['dateModified'][5:7]), int(cases['dateModified'][8:10]), int(cases['dateModified'][11:13]), int(cases['dateModified'][14:16]), int(cases['dateModified'][17:19]), 0)
-update = "COVID-19 Update | NEW YORK - USA\n- New Cases: "+ f"{cases['positiveIncrease']:,}" + "\n- New Deaths: " + f"{cases['deathIncrease']:,}" + "\n- Total Cases: " + f"{cases['positive']:,}" + "\n- Total Deaths: " + f"{cases['death']:,}," + "\nUpdated " + date.strftime(updated, "%B %d, %Y %I:%M%p")
+updated = datetime.datetime(int(cases[0]['lastModified'][:4]), int(cases[0]['lastModified'][5:7]), int(cases[0]['lastModified'][8:10]), int(cases[0]['lastModified'][11:13]), int(cases[0]['lastModified'][14:16]), int(cases[0]['lastModified'][17:19]), 0)
+update = "COVID-19 Update | UNITED STATES\n- New Cases: "+ f"{cases[0]['positiveIncrease']:,}" + "\n- New Deaths: " + f"{cases[0]['deathIncrease']:,}" + "\n- Total Cases: " + f"{cases[0]['positive']:,}" + "\n- Total Deaths: " + f"{cases[0]['death']:,}," + "\nUpdated " + date.strftime(updated, "%B %d, %Y %I:%M%p")
 print(update)

@@ -12,6 +12,7 @@ def incoming_sms():
 
     resp = MessagingResponse()
 
+    ############ STOCK ############
     if body == 'STONK':
         resp.message("\nSTONKS ONLY GO UP. TRUST IN ME. INK JUST REPLACED.\n -J POW")
     # In this upcoming case, the market bot gives a market update!
@@ -69,6 +70,7 @@ def incoming_sms():
             "- DOW J: " + str(dji_close) + " (" + str(dji_change) +")\n- S&P 500: " + 
             str(gspc_close) + " (" + str(gspc_change) + ")\n- NASDAQ: " + str(ixic_close) 
             + " (" + str(ixic_change)+")")
+    ############ COVID 19 ############        
     elif body.lower()[0:body.lower().find(' ')] == 'covid':
         # COVID updates
         states = {'alabama': 'AL',
@@ -129,18 +131,38 @@ def incoming_sms():
             'wyoming': 'WY'}
         # Takes state as input, and returns the latest covid numbers for that state.
         state = body.lower()[body.lower().find(' ')+1:]
-        state = states[state.lower()] # Grabbing the states abbreviation
-        cases = requests.get('https://covidtracking.com/api/v1/states/' + state.lower() + '/current.json')
-        cases = cases.json()
-        updated = datetime.datetime(int(cases['dateModified'][:4]), 
-        int(cases['dateModified'][5:7]), int(cases['dateModified'][8:10]), 
-        int(cases['dateModified'][11:13]), int(cases['dateModified'][14:16]), 
-        int(cases['dateModified'][17:19]), 0)
-        resp.message("COVID-19 Update | " + 
-        body.lower()[body.lower().find(' ')+1:].upper() + " - USA\n- New Cases: "+
-         f"{cases['positiveIncrease']:,}" + "\n- New Deaths: " + f"{cases['deathIncrease']:,}" +
-          "\n- Total Cases: " + f"{cases['positive']:,}" + "\n- Total Deaths: " + f"{cases['death']:,}" + 
-          "\nUpdated " + date.strftime(updated, "%B %d, %Y %I:%M%p") + "\nWear a mask :)")
+        if (state.lower() == "united states" or state.lower() == 'usa' or state.lower() == 'us' or state.lower() == 'america'):
+            ## COVID NUMBERS FOR USA AS A WHOLE
+            cases = requests.get('https://covidtracking.com/api/v1/us/current.json')
+            cases = cases.json()
+            updated = datetime.datetime(int(cases[0]['lastModified'][:4]), int(cases[0]['lastModified'][5:7]),
+             int(cases[0]['lastModified'][8:10]), int(cases[0]['lastModified'][11:13]), int(cases[0]['lastModified'][14:16]),
+              int(cases[0]['lastModified'][17:19]), 0)
+
+            resp.message("COVID-19 Update | UNITED STATES\n- New Cases: "+ 
+            f"{cases[0]['positiveIncrease']:,}" + "\n- New Deaths: " +
+             f"{cases[0]['deathIncrease']:,}" + "\n- Total Cases: " + f"{cases[0]['positive']:,}" +
+              "\n- Total Deaths: " + f"{cases[0]['death']:,}," + "\nUpdated " + date.strftime(updated, "%B %d, %Y %I:%M%p") + "\nWear a mask :)")
+            return str(resp)
+        
+        ## Need to make sure the 'state' is an actual state
+        if state.lower() in states:
+            state = states[state.lower()] # Grabbing the states abbreviation
+            cases = requests.get('https://covidtracking.com/api/v1/states/' + state.lower() + '/current.json')
+            cases = cases.json()
+            updated = datetime.datetime(int(cases['dateModified'][:4]), 
+            int(cases['dateModified'][5:7]), int(cases['dateModified'][8:10]), 
+            int(cases['dateModified'][11:13]), int(cases['dateModified'][14:16]), 
+            int(cases['dateModified'][17:19]), 0)
+            resp.message("COVID-19 Update | " + 
+            body.lower()[body.lower().find(' ')+1:].upper() + " - USA\n- New Cases: "+
+            f"{cases['positiveIncrease']:,}" + "\n- New Deaths: " + f"{cases['deathIncrease']:,}" +
+            "\n- Total Cases: " + f"{cases['positive']:,}" + "\n- Total Deaths: " + f"{cases['death']:,}" + 
+            "\nUpdated " + date.strftime(updated, "%B %d, %Y %I:%M%p") + "\nWear a mask :)")
+        else:
+            resp.message('STATE/COUNTRY Input unrecognized. \nPlease check your spelling.\n - COUNTRIES SUPPORTED: USA')
+    else:
+        resp.message("Input Unrecognized!\nFunctions supported:\n- 'market update'\n- 'covid [territory]', where 'territory' can be any US state, or the US as a whole.")
     return str(resp)
 
 if __name__ == "__main__":
